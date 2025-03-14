@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Model files (large files)
+# Uncomment if you want to exclude the model file from the repository
+# *.pt
+
+# Generated files
+api_result.jpg
+api_result_url.jpg
+
+# Logs
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db 
