@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Object Detection API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            background-color: #f5f5f5;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .result {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input[type="text"], input[type="file"] {
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+    <script>
+        // Test the health endpoint
+        function testHealth() {
+            fetch('/api/health')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('healthResult').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('healthResult').textContent = 'Error: ' + error;
+                });
+        }
+
+        // Test the detect_url endpoint
+        function testDetectUrl() {
+            const imageUrl = document.getElementById('imageUrl').value;
+            
+            fetch('/api/detect_url', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: imageUrl })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('urlResult').textContent = JSON.stringify(data, null, 2);
+                if (data.processed_image) {
+                    document.getElementById('urlImage').src = 'data:image/jpeg;base64,' + data.processed_image;
+                    document.getElementById('urlImage').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                document.getElementById('urlResult').textContent = 'Error: ' + error;
+            });
+        }
+
+        // Handle file upload form submission
+        function handleFileUpload(event) {
+            event.preventDefault();
+            
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                document.getElementById('uploadResult').textContent = 'Please select a file';
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            fetch('/api/detect', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('uploadResult').textContent = JSON.stringify(data, null, 2);
+                if (data.processed_image) {
+                    document.getElementById('uploadImage').src = 'data:image/jpeg;base64,' + data.processed_image;
+                    document.getElementById('uploadImage').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                document.getElementById('uploadResult').textContent = 'Error: ' + error;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Object Detection API Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Health Endpoint</h2>
+        <p>This tests the basic health check endpoint.</p>
+        <button onclick="testHealth()">Check API Health</button>
+        <div id="healthResult" class="result">Results will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test Image Upload</h2>
+        <p>Upload an image to test object detection.</p>
+        <form id="uploadForm" onsubmit="handleFileUpload(event)">
+            <input type="file" id="fileInput" name="image" accept="image/*">
+            <button type="submit">Detect Objects</button>
+        </form>
+        <div id="uploadResult" class="result">Results will appear here...</div>
+        <img id="uploadImage" style="display:none;">
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test Image URL</h2>
+        <p>Provide an image URL to test object detection.</p>
+        <input type="text" id="imageUrl" placeholder="Enter image URL" value="https://ultralytics.com/images/zidane.jpg">
+        <button onclick="testDetectUrl()">Detect Objects</button>
+        <div id="urlResult" class="result">Results will appear here...</div>
+        <img id="urlImage" style="display:none;">
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Direct Form Submission</h2>
+        <p>This form will submit directly to the API endpoint.</p>
+        <form action="/api/detect" method="post" enctype="multipart/form-data" target="_blank">
+            <input type="file" name="image" accept="image/*">
+            <button type="submit">Detect Objects (Direct)</button>
+        </form>
+    </div>
+</body>
+</html> 
